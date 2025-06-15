@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>表白墙</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #fff0f5;
+        }
+        h1 {
+            color: #ff69b4;
+        }
+        .message {
+            background-color: #ffe4e1;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        form {
+            margin-top: 20px;
+        }
+        input, textarea, button {
+            display: block;
+            margin-bottom: 10px;
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .comment {
+            margin-left: 20px;
+            padding: 5px;
+            background-color: #e6e6fa;
+            border-radius: 3px;
+        }
+        .like-button {
+            background-color: #ff69b4;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .like-button.liked {
+            background-color: #ff1493;
+        }
+    </style>
+</head>
+<body>
+    <h1>表白墙</h1>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="message">
+                <strong>{{ message.name }}:</strong>
+                <p>{{ message.message }}</p>
+                
+                <form action="{{ url_for('like', message_id=message.id) }}" method="POST">
+                    <button type="submit" class="like-button {{ 'liked' if message.id in liked_messages else '' }}">
+                        点赞 ({{ message.like_count }})
+                    </button>
+                </form>
+                
+                <p>评论数: {{ message.comment_count }}</p>
+                
+                <div id="comments-{{ message.id }}">
+                    {% for comment in comments if comment.message_id == message.id %}
+                        <div class="comment">
+                            <strong>{{ comment.name }}:</strong>
+                            <p>{{ comment.comment }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <form action="{{ url_for('add_comment', message_id=message.id) }}" method="POST">
+                    <textarea name="comment" placeholder="写下你的评论..." required></textarea>
+                    <button type="submit">添加评论</button>
+                </form>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>还没有表白信息，快来发布第一条吧！</p>
+    {% endif %}
+
+    <form action="{{ url_for('add_message') }}" method="POST">
+        <textarea name="message" placeholder="写下你的心意..." required></textarea>
+        <button type="submit">发布表白</button>
+    </form>
+    
+    <p><a href="{{ url_for('logout') }}">登出</a></p>
+</body>
+</html>
